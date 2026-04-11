@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+<<<<<<< Updated upstream
 // Bạn có thể thay đổi port nếu Spring Boot của bạn không chạy ở 8080
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
@@ -16,10 +17,25 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token');
     
     if (token && config.headers) {
+=======
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor to add JWT to headers
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+>>>>>>> Stashed changes
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
+<<<<<<< Updated upstream
   (error) => {
     return Promise.reject(error);
   }
@@ -53,6 +69,9 @@ api.interceptors.response.use(
 
     return Promise.reject(error);
   }
+=======
+  (error) => Promise.reject(error)
+>>>>>>> Stashed changes
 );
 
 export default api;
