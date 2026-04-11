@@ -14,8 +14,9 @@ import com.examapp.security.JwtUtil;
 import com.examapp.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -54,14 +56,19 @@ class AuthControllerTest {
     @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @BeforeEach
-    void setUpMockMvc() {
+    void setUpMockMvc() throws ServletException, IOException {
+        // Compiler treats Mockito's .when(mock).doFilter(...) as invoking Filter.doFilter (checked exceptions).
         doAnswer(invocation -> {
-            HttpServletRequest req = invocation.getArgument(0);
-            HttpServletResponse res = invocation.getArgument(1);
+            ServletRequest req = invocation.getArgument(0);
+            ServletResponse res = invocation.getArgument(1);
             FilterChain chain = invocation.getArgument(2);
-            chain.doFilter(req, res);
+            try {
+                chain.doFilter(req, res);
+            } catch (ServletException | IOException e) {
+                throw new RuntimeException(e);
+            }
             return null;
-        }).when(jwtAuthenticationFilter).doFilterInternal(any(), any(), any());
+        }).when(jwtAuthenticationFilter).doFilter(any(), any(), any());
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
