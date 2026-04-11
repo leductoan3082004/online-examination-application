@@ -89,6 +89,18 @@ class ExamServiceTest {
     }
 
     @Test
+    void getTest_success() {
+        User teacher = createTeacher();
+        Exam exam = createExam(teacher);
+        when(examRepository.findById(1L)).thenReturn(Optional.of(exam));
+
+        TestResponse response = examService.getTest(1L, 1L);
+
+        assertEquals("Math Test", response.title());
+        assertEquals("ABC123", response.passcode());
+    }
+
+    @Test
     void updateTest_success() {
         User teacher = createTeacher();
         Exam exam = createExam(teacher);

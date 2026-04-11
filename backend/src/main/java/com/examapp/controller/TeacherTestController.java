@@ -47,6 +47,13 @@ public class TeacherTestController {
         return ResponseEntity.ok(examService.listTests(teacherId));
     }
 
+    @GetMapping("/{testId}")
+    @Operation(summary = "Get a test by id", description = "Returns full test details if the authenticated teacher owns it")
+    public ResponseEntity<TestResponse> getTest(Authentication auth, @PathVariable Long testId) {
+        Long teacherId = (Long) auth.getPrincipal();
+        return ResponseEntity.ok(examService.getTest(teacherId, testId));
+    }
+
     @PutMapping("/{testId}")
     @Operation(summary = "Update a test", description = "Updates title, description, and passcode of an existing test")
     public ResponseEntity<TestResponse> updateTest(Authentication auth,

@@ -58,6 +58,11 @@ public class ExamService {
                 .toList();
     }
 
+    public TestResponse getTest(Long teacherId, Long testId) {
+        Exam exam = getOwnedExam(teacherId, testId);
+        return toTestResponse(exam);
+    }
+
     @Transactional
     public TestResponse updateTest(Long teacherId, Long testId, CreateTestRequest request) {
         Exam exam = getOwnedExam(teacherId, testId);
