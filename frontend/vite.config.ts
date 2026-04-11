@@ -8,6 +8,8 @@ export default defineConfig({
     react()
   ],
   server: {
+    // ngrok (and similar tunnels) send a non-localhost Host header; Vite blocks those unless allowed.
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

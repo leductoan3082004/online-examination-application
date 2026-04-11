@@ -1,0 +1,17 @@
+# Example ngrok config — copy to ngrok.yml in this folder or merge into your global config.
+#
+# ERR_NGROK_8012 + "undefined://undefined" means the tunnel has no valid `addr` / upstream.
+# Fix: always set proto + addr (v2) or upstream.url (v3), and start Vite BEFORE opening the ngrok URL.
+#
+# Option A — use this file from repo root:
+#   ngrok start --config ngrok.yml frontend
+#
+# Option B — simplest (no config file):
+#   cd frontend && npm run dev
+#   ngrok http 5173
+
+version: "2"
+tunnels:
+  frontend:
+    proto: http
+    addr: 5173
