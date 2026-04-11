@@ -1,13 +1,9 @@
-import './App.css'
-import TeacherDashboard from './pages/TeacherDashboard'
-import { BrowserRouter as Router } from 'react-router-dom'
+import AppRoutes from './routes';
 
 function App() {
   return (
-    <Router>
-      <TeacherDashboard />
-    </Router>
-  )
+    <AppRoutes />
+  );
 }
 
-export default App
+export default App;
