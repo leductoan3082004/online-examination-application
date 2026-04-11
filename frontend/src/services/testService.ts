@@ -1,40 +1,26 @@
-import type { Question, QuestionPayload } from '../types';
+import api from './api';
 
-// Base URL pattern: /api/teacher/tests/{testId}/questions
-export const testService = {
-    // BE-3.2 Get Questions
-    getQuestions: async (testId: string): Promise<Question[]> => {
-        // GET /api/teacher/tests/{testId}/questions
-        // Mocking the API delay
-        await new Promise(resolve => setTimeout(resolve, 600));
-        return []; // Returns empty array to simulate a new test
-    },
+export const getQuestions = async (testId: string) => {
+  const response = await api.get(`/teacher/tests/${testId}/questions`);
+  return response.data;
+};
 
-    // BE-3.1 Add Question
-    createQuestion: async (testId: string, payload: QuestionPayload): Promise<Question> => {
-        // POST /api/teacher/tests/{testId}/questions
-        await new Promise(resolve => setTimeout(resolve, 400));
-        return { ...payload, id: `q-${Date.now()}` } as Question;
-    },
+export const addQuestion = async (testId: string, questionData: any) => {
+  const response = await api.post(`/teacher/tests/${testId}/questions`, questionData);
+  return response.data;
+};
 
-    // BE-3.3 Update Question
-    updateQuestion: async (testId: string, questionId: string | number, payload: QuestionPayload): Promise<Question> => {
-        // PUT /api/teacher/tests/{testId}/questions/{questionId}
-        await new Promise(resolve => setTimeout(resolve, 400));
-        return { ...payload, id: questionId } as Question;
-    },
+export const updateQuestion = async (testId: string, questionId: string, questionData: any) => {
+  const response = await api.put(`/teacher/tests/${testId}/questions/${questionId}`, questionData);
+  return response.data;
+};
 
-    // BE-3.4 Delete Question
-    deleteQuestion: async (testId: string, questionId: string | number): Promise<void> => {
-        // DELETE /api/teacher/tests/{testId}/questions/{questionId}
-        await new Promise(resolve => setTimeout(resolve, 400));
-    },
+export const deleteQuestion = async (testId: string, questionId: string) => {
+  const response = await api.delete(`/teacher/tests/${testId}/questions/${questionId}`);
+  return response.data;
+};
 
-    // BE-3.5 Reorder Questions
-    reorderQuestions: async (testId: string, questionIds: (string | number)[]): Promise<void> => {
-        // PUT /api/teacher/tests/{testId}/questions/reorder
-        // Payload required by BE: { "questionIds": [3, 1, 2] }
-        console.log(`PUT /api/teacher/tests/${testId}/questions/reorder`, { questionIds });
-        await new Promise(resolve => setTimeout(resolve, 400));
-    }
+export const reorderQuestions = async (testId: string, questionIds: string[]) => {
+  const response = await api.put(`/teacher/tests/${testId}/questions/reorder`, { questionIds });
+  return response.data;
 };
