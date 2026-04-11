@@ -1,13 +1,19 @@
 package com.examapp.controller;
 
-import com.examapp.dto.auth.*;
+import com.examapp.dto.auth.AuthResponse;
+import com.examapp.dto.auth.LoginRequest;
+import com.examapp.dto.auth.RegisterRequest;
+import com.examapp.dto.auth.RegisterResponse;
 import com.examapp.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
