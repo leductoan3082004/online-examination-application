@@ -1,40 +1,10 @@
+// TeacherDashboard.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FileText, Trash2, KeyRound, Clock } from 'lucide-react';
+import { TestService, type TestItem } from '../services/testService';
 
-interface TestItem {
-  id: string;
-  title: string;
-  passcode: string;
-  questionCount: number;
-  createdAt: string;
-}
-
-const MOCK_TESTS: TestItem[] = [
-  {
-    id: 't-001',
-    title: 'Software Engineering Midterm',
-    passcode: 'MID2026',
-    questionCount: 40,
-    createdAt: '2026-04-10T08:00:00Z',
-  },
-  {
-    id: 't-002',
-    title: 'Agile & Scrum Quiz 1',
-    passcode: 'AGILE101',
-    questionCount: 15,
-    createdAt: '2026-04-05T14:30:00Z',
-  },
-  {
-    id: 't-003',
-    title: 'Final Exam - Database Systems',
-    passcode: 'DBFINAL',
-    questionCount: 60,
-    createdAt: '2026-04-01T09:15:00Z',
-  },
-];
-
-const TeacherDashboard: React.FC = () => {
+export const TeacherDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [tests, setTests] = useState<TestItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -43,15 +13,14 @@ const TeacherDashboard: React.FC = () => {
     const fetchTests = async () => {
       setIsLoading(true);
       try {
-        setTimeout(() => {
-          const sorted = [...MOCK_TESTS].sort(
-            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-          setTests(sorted);
-          setIsLoading(false);
-        }, 600);
+        const data = await TestService.getTests();
+        const sorted = data.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setTests(sorted);
       } catch (error) {
         console.error('Failed to fetch tests', error);
+      } finally {
         setIsLoading(false);
       }
     };
@@ -66,11 +35,18 @@ const TeacherDashboard: React.FC = () => {
     navigate(`/dashboard/tests/${testId}/edit`);
   };
 
-  const handleDeleteTest = (e: React.MouseEvent, testId: string) => {
+  const handleDeleteTest = async (e: React.MouseEvent, testId: string) => {
     e.stopPropagation();
     const confirmDelete = window.confirm('Are you sure you want to delete this test?');
+
     if (confirmDelete) {
-      setTests(tests.filter((t) => t.id !== testId));
+      try {
+        await TestService.deleteTest(testId);
+        setTests(tests.filter((t) => t.id !== testId));
+      } catch (error) {
+        console.error('Failed to delete test', error);
+        alert('Failed to delete the test. Please try again.');
+      }
     }
   };
 
@@ -117,7 +93,9 @@ const TeacherDashboard: React.FC = () => {
             </p>
             <button
               onClick={handleCreateTest}
-              className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-lg shadow-primary/20"
+              className="flex items-center gap-2 bg-blue-600 
+              hover:bg-blue-700 text-white px-6 py-2.5 rounded-md font-medium transition-colors 
+              shadow-sm cursor-pointer"
             >
               <Plus size={20} />
               Create your first test
@@ -135,7 +113,7 @@ const TeacherDashboard: React.FC = () => {
                   <h3 className="font-bold text-lg text-slate-800 leading-tight group-hover:text-primary transition-colors line-clamp-2">
                     {test.title}
                   </h3>
-                  
+
                   <button
                     onClick={(e) => handleDeleteTest(e, test.id)}
                     className="absolute top-6 right-6 p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
@@ -155,7 +133,7 @@ const TeacherDashboard: React.FC = () => {
                       {test.passcode}
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
                     <span className="flex items-center gap-1.5">
                       <FileText size={16} className="text-slate-300" />
