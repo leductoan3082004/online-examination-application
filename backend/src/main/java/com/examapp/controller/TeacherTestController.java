@@ -1,6 +1,7 @@
 package com.examapp.controller;
 
 import com.examapp.dto.test.CreateTestRequest;
+import com.examapp.dto.test.TestDetailResponse;
 import com.examapp.dto.test.TestResponse;
 import com.examapp.dto.test.TestSummaryResponse;
 import com.examapp.service.ExamService;
@@ -45,6 +46,13 @@ public class TeacherTestController {
     public ResponseEntity<List<TestSummaryResponse>> listTests(Authentication auth) {
         Long teacherId = (Long) auth.getPrincipal();
         return ResponseEntity.ok(examService.listTests(teacherId));
+    }
+
+    @GetMapping("/{testId}")
+    @Operation(summary = "Get test details", description = "Returns test metadata, question count, and submission statistics")
+    public ResponseEntity<TestDetailResponse> getTestDetail(Authentication auth, @PathVariable Long testId) {
+        Long teacherId = (Long) auth.getPrincipal();
+        return ResponseEntity.ok(examService.getTestDetail(teacherId, testId));
     }
 
     @PutMapping("/{testId}")
