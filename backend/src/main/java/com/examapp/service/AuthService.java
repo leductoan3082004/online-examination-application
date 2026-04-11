@@ -1,9 +1,11 @@
 package com.examapp.service;
 
+import com.examapp.dto.MessageResponse;
 import com.examapp.dto.auth.*;
 import com.examapp.entity.User;
 import com.examapp.enums.Role;
 import com.examapp.exception.DuplicateResourceException;
+import com.examapp.exception.ResourceNotFoundException;
 import com.examapp.exception.UnauthorizedException;
 import com.examapp.repository.UserRepository;
 import com.examapp.security.JwtUtil;
@@ -53,5 +55,19 @@ public class AuthService {
 
         return new AuthResponse(token,
                 new AuthResponse.UserDto(user.getId(), user.getName(), user.getEmail(), user.getRole().name()));
+    }
+
+    public MessageResponse changePassword(Long userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new UnauthorizedException("Current password is incorrect");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        return new MessageResponse("Password updated successfully");
     }
 }
