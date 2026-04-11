@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FileText, Trash2, KeyRound, Clock } from 'lucide-react';
@@ -172,6 +173,15 @@ export const TeacherDashboard: React.FC = () => {
           </div>
         )}
       </div>
+=======
+import React from 'react';
+
+const TeacherDashboard: React.FC = () => {
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">Teacher Dashboard</h1>
+      <p className="text-slate-600">Review class results and manage your tests.</p>
+>>>>>>> Stashed changes
     </div>
   );
 };
