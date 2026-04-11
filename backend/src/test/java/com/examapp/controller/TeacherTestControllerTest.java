@@ -73,6 +73,18 @@ class TeacherTestControllerTest {
     }
 
     @Test
+    void getTest_returnsTest() throws Exception {
+        TestResponse response = new TestResponse(1L, "Math", "Description", "ABC", 1L, Instant.now(), Instant.now());
+        when(examService.getTest(1L, 1L)).thenReturn(response);
+
+        mockMvc.perform(get("/api/teacher/tests/1").with(asTeacher()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.title").value("Math"))
+                .andExpect(jsonPath("$.passcode").value("ABC"));
+    }
+
+    @Test
     void updateTest_returnsUpdated() throws Exception {
         CreateTestRequest request = new CreateTestRequest("Updated", "Desc", "ABC");
         TestResponse response = new TestResponse(1L, "Updated", "Desc", "ABC", 1L, Instant.now(), Instant.now());

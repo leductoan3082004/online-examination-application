@@ -3,7 +3,7 @@ import type { Question, QuestionPayload } from '../types';
 // Base URL pattern: /api/teacher/tests/{testId}/questions
 export const testService = {
     // BE-3.2 Get Questions
-    getQuestions: async (testId: string): Promise<Question[]> => {
+    getQuestions: async (_testId: string): Promise<Question[]> => {
         // GET /api/teacher/tests/{testId}/questions
         // Mocking the API delay
         await new Promise(resolve => setTimeout(resolve, 600));
@@ -11,21 +11,21 @@ export const testService = {
     },
 
     // BE-3.1 Add Question
-    createQuestion: async (testId: string, payload: QuestionPayload): Promise<Question> => {
+    createQuestion: async (_testId: string, payload: QuestionPayload): Promise<Question> => {
         // POST /api/teacher/tests/{testId}/questions
         await new Promise(resolve => setTimeout(resolve, 400));
         return { ...payload, id: `q-${Date.now()}` } as Question;
     },
 
     // BE-3.3 Update Question
-    updateQuestion: async (testId: string, questionId: string | number, payload: QuestionPayload): Promise<Question> => {
+    updateQuestion: async (_testId: string, questionId: string | number, payload: QuestionPayload): Promise<Question> => {
         // PUT /api/teacher/tests/{testId}/questions/{questionId}
         await new Promise(resolve => setTimeout(resolve, 400));
         return { ...payload, id: questionId } as Question;
     },
 
     // BE-3.4 Delete Question
-    deleteQuestion: async (testId: string, questionId: string | number): Promise<void> => {
+    deleteQuestion: async (_testId: string, _questionId: string | number): Promise<void> => {
         // DELETE /api/teacher/tests/{testId}/questions/{questionId}
         await new Promise(resolve => setTimeout(resolve, 400));
     },

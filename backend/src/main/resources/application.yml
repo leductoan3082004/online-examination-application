@@ -17,6 +17,9 @@ app:
   jwt:
     secret: ${JWT_SECRET:}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}  # 24 hours
+  # Optional comma-separated exact origins (patterns for localhost + ngrok are already enabled in SecurityConfig).
+  cors:
+    additional-origins: ${CORS_ADDITIONAL_ORIGINS:}
 
 springdoc:
   api-docs:
