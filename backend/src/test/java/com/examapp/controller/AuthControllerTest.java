@@ -1,5 +1,6 @@
 package com.examapp.controller;
 
+import com.examapp.config.SecurityConfig;
 import com.examapp.dto.MessageResponse;
 import com.examapp.dto.auth.AuthResponse;
 import com.examapp.dto.auth.ChangePasswordRequest;
@@ -12,42 +13,59 @@ import com.examapp.security.JwtAuthenticationFilter;
 import com.examapp.security.JwtUtil;
 import com.examapp.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import(SecurityConfig.class)
 class AuthControllerTest {
 
-    @Autowired private MockMvc mockMvc;
+    private MockMvc mockMvc;
+
+    @Autowired private WebApplicationContext webApplicationContext;
     @Autowired private ObjectMapper objectMapper;
     @MockBean private AuthService authService;
     @MockBean private JwtUtil jwtUtil;
     @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private static RequestPostProcessor asTeacher() {
-        return request -> {
-            request.setUserPrincipal(new UsernamePasswordAuthenticationToken(1L, "token",
-                    List.of(new SimpleGrantedAuthority("ROLE_TEACHER"))));
-            return request;
-        };
+    @BeforeEach
+    void setUpMockMvc() {
+        doAnswer(invocation -> {
+            HttpServletRequest req = invocation.getArgument(0);
+            HttpServletResponse res = invocation.getArgument(1);
+            FilterChain chain = invocation.getArgument(2);
+            chain.doFilter(req, res);
+            return null;
+        }).when(jwtAuthenticationFilter).doFilterInternal(any(), any(), any());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
     }
 
     @Test
@@ -136,8 +154,11 @@ class AuthControllerTest {
         when(authService.changePassword(eq(1L), any(ChangePasswordRequest.class)))
                 .thenReturn(new MessageResponse("Password updated successfully"));
 
+        var auth = new UsernamePasswordAuthenticationToken(
+                1L, "token", List.of(new SimpleGrantedAuthority("ROLE_TEACHER")));
+
         mockMvc.perform(post("/api/auth/change-password")
-                        .with(asTeacher())
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
