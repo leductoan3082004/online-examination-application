@@ -1,5 +1,6 @@
 package com.examapp.controller;
 
+import com.examapp.dto.MessageResponse;
 import com.examapp.dto.auth.*;
 import com.examapp.exception.DuplicateResourceException;
 import com.examapp.exception.UnauthorizedException;
@@ -13,10 +14,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -108,5 +115,22 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").value("Invalid credentials"));
+    }
+
+    @Test
+    void changePassword_returnsOk() throws Exception {
+        ChangePasswordRequest request = new ChangePasswordRequest("password123", "newpassword1");
+        when(authService.changePassword(eq(1L), any(ChangePasswordRequest.class)))
+                .thenReturn(new MessageResponse("Password updated successfully"));
+
+        var auth = new UsernamePasswordAuthenticationToken(
+                1L, "token", List.of(new SimpleGrantedAuthority("ROLE_TEACHER")));
+
+        mockMvc.perform(post("/api/auth/change-password")
+                        .with(authentication(auth))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Password updated successfully"));
     }
 }
