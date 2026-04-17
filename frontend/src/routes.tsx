@@ -9,7 +9,9 @@ import TakeTest from './pages/TakeTest';
 import CreateTest from './pages/CreateTest';
 import EditTest from './pages/EditTest';
 import TeacherDashboard from './pages/TeacherDashboard';
-
+import Result from './pages/Result';
+import DetailResult from './pages/DetailResult';
+import AccessTest from './pages/AccessTest';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -41,6 +43,10 @@ const AppRoutes = () => {
           <a href="/login" className="text-primary font-bold hover:underline">Go back to Login</a>
         </div>
       } />
+
+      <Route path="/my-results" element={<Result />} />
+      <Route path="/results/:attemptId" element={<DetailResult />} />
+      <Route path="/access-test" element={<AccessTest />} />
     </Routes>
   );
 };
