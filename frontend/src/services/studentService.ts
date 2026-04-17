@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://localhost:8080/api/student';
  * TOKEN TEST (STUDENT ROLE)
  * Huy dán token vào đây để test nhanh nếu chưa làm trang Login
  */
-const HARDCODED_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwidGVzdElkIjoxLCJyb2xlIjoiU1RVREVOVCIsImlhdCI6MTc3NTg5NDgyMiwiZXhwIjoxNzc1OTgxMjIyfQ.U53_inbiG517W8tGGniBGvNSSn4WoUOJVUOAjgCD7VU';
+const HARDCODED_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwidGVzdElkIjoxLCJyb2xlIjoiU1RVREVOVCIsImlhdCI6MTc3NTg5NjU1NCwiZXhwIjoxNzc1OTgyOTU0fQ.rkQG8K4zs72emU9skVABxoej9bh-dur6aNLwLRa7mGA';
 
 const getAuthHeaders = () => {
     // Ưu tiên lấy từ localStorage, nếu không có thì dùng token dán sẵn ở trên

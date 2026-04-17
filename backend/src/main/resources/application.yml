@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/examdb}
-    username: ${DB_USERNAME:examuser}
-    password: ${DB_PASSWORD:exampass}
+    username: examuser
+    password: exampass
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
