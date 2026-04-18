@@ -1,31 +1,28 @@
+// src/pages/LandingPage.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PublicHeader from '../components/public/PublicHeader';
+import { GraduationCap, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const passcodeRef = useRef<HTMLInputElement>(null);
 
-  // Form State
   const [passcode, setPasscode] = useState('');
   const [studentName, setStudentName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. Guard Behavior: Kiểm tra nếu là Teacher đã login
   useEffect(() => {
+    // Guard: Đẩy giáo viên vào thẳng dashboard nếu đã login
     const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role'); // Giả sử nhóm lưu role vào đây
+    const role = localStorage.getItem('role');
     if (token && role === 'TEACHER') {
       navigate('/dashboard');
     }
-    
-    // Autofocus field Passcode khi load trang
     passcodeRef.current?.focus();
   }, [navigate]);
 
-  // 2. Xử lý logic Submit
   const handleStartTest = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -37,95 +34,110 @@ const LandingPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Gọi API theo đặc tả Notion
+      // Đợi ghép API thật của nhóm sau
       const response = await axios.post('/api/student/access', {
         passcode: trimmedPasscode,
         name: trimmedName
       });
-
-      // Giả sử API trả về { token: '...', testId: 123 }
-      const { token, testId } = response.data;
       
-      localStorage.setItem('student_token', token);
-      navigate(`/test/${testId}`);
+      localStorage.setItem('student_token', response.data.token);
+      navigate(`/test/${response.data.testId}`);
       
     } catch (err: any) {
-      if (err.response?.status === 404 || err.response?.status === 401) {
-        setError("Invalid passcode. Check with your teacher.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      setError("Invalid passcode. Check with your teacher.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Nút Start Test bị disabled nếu 1 trong 2 field trống (sau khi trim)
   const isButtonDisabled = !passcode.trim() || !studentName.trim() || isLoading;
 
   return (
-    <div style={styles.container}>
-      <PublicHeader />
-      
-      <main style={styles.hero}>
-        <h1 style={styles.headline}>Enter your test passcode to begin</h1>
-        <p style={styles.subline}>No account needed — just your name and the code from your teacher</p>
-
-        <form onSubmit={handleStartTest} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <input
-              ref={passcodeRef}
-              type="text"
-              placeholder="Test Passcode"
-              value={passcode}
-              onChange={(e) => setPasscode(e.target.value)}
-              maxLength={20}
-              autoComplete="off"
-              style={styles.input}
-            />
+    <div className="min-h-screen flex flex-col bg-gray-50/50">
+      {/* PUBLIC HEADER (Tương đồng với AuthLayout nhưng có nút Login) */}
+      <header className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white">
+        <div className="flex items-center gap-2">
+          <div className="bg-blue-600 p-2 rounded-lg">
+            <GraduationCap className="w-5 h-5 text-white" />
           </div>
+          <span className="text-xl font-bold tracking-tight text-slate-800">
+            Edu<span className="text-blue-600">Exam</span>
+          </span>
+        </div>
+        <button 
+          onClick={() => navigate('/login')}
+          className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+        >
+          Teacher Login
+        </button>
+      </header>
 
-          <div style={styles.inputGroup}>
-            <input
-              type="text"
-              placeholder="Your Full Name"
-              value={studentName}
-              onChange={(e) => setStudentName(e.target.value)}
-              maxLength={100}
-              autoComplete="name"
-              style={styles.input}
-            />
-          </div>
+      {/* HERO SECTION */}
+      <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-full max-w-md">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3 tracking-tight">
+            Enter your passcode to begin
+          </h1>
+          <p className="text-slate-500 mb-8 text-lg">
+            No account needed — just your name and the code from your teacher.
+          </p>
 
-          {error && <div style={styles.errorMsg}>{error}</div>}
-
-          <button 
-            type="submit" 
-            disabled={isButtonDisabled}
-            style={{
-              ...styles.submitBtn,
-              backgroundColor: isButtonDisabled ? '#ccc' : '#007bff',
-              cursor: isButtonDisabled ? 'not-allowed' : 'pointer'
-            }}
+          <form 
+            onSubmit={handleStartTest} 
+            className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-left"
           >
-            {isLoading ? 'Processing...' : 'Start Test'}
-          </button>
-        </form>
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Test Passcode</label>
+                <input
+                  ref={passcodeRef}
+                  type="text"
+                  value={passcode}
+                  onChange={(e) => setPasscode(e.target.value)}
+                  maxLength={20}
+                  autoComplete="off"
+                  placeholder="e.g. MATH2024"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Your Full Name</label>
+                <input
+                  type="text"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  maxLength={100}
+                  autoComplete="name"
+                  placeholder="John Doe"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all"
+                />
+              </div>
+
+              {error && (
+                <div className="text-red-500 text-sm font-medium bg-red-50 p-3 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isButtonDisabled}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-white transition-all
+                  ${isButtonDisabled 
+                    ? 'bg-slate-300 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700 shadow-sm hover:shadow-md'
+                  }`}
+              >
+                {isLoading ? 'Processing...' : 'Start Test'}
+                {!isLoading && <ArrowRight className="w-5 h-5" />}
+              </button>
+            </div>
+          </form>
+        </div>
       </main>
     </div>
   );
-};
-
-const styles: { [key: string]: React.CSSProperties } = {
-  container: { minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f9f9f9' },
-  hero: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 20px' },
-  headline: { fontSize: '32px', marginBottom: '10px', color: '#1a1a1a', textAlign: 'center' },
-  subline: { fontSize: '18px', color: '#666', marginBottom: '30px', textAlign: 'center' },
-  form: { width: '100%', maxWidth: '400px', backgroundColor: '#fff', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' },
-  inputGroup: { marginBottom: '15px' },
-  input: { width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '6px', fontSize: '16px', boxSizing: 'border-box' },
-  errorMsg: { color: '#d93025', fontSize: '14px', marginBottom: '15px', textAlign: 'left' },
-  submitBtn: { width: '100%', padding: '14px', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', transition: '0.3s' }
 };
 
 export default LandingPage;
