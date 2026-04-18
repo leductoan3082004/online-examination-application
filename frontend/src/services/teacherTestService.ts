@@ -39,13 +39,15 @@ export const TestService = {
 };
 
 export interface TestStatistics {
+  totalAttempts: number;
   averageScore: number;
   highestScore: number;
   lowestScore: number;
+  averagePercentage: number;
   passRate: number;
-  totalStudents: number;
-  scoreDistribution: {
-    bucket: string;
+  passThreshold: number;
+  distribution: {
+    range: string;    // BE-13.1 uses "range", not "bucket"
     count: number;
   }[];
 }
