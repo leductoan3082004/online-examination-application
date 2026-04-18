@@ -88,13 +88,35 @@ const ViewClassResult: React.FC = () => {
   const [page, setPage] = useState(0);
   const PAGE_SIZE = 20;
 
-  // Task 15 logic
-  const handleExportCSV = () => {
-    window.open(`/api/teacher/tests/${testId}/results/export?format=csv`, '_blank');
+  const downloadExport = async (format: 'csv' | 'xlsx') => {
+    if (!testId) return;
+    try {
+      const response = await api.get(`/teacher/tests/${testId}/results/export`, {
+        params: { format },
+        responseType: 'blob',
+      });
+
+      const disposition = response.headers['content-disposition'] as string | undefined;
+      const match = disposition?.match(/filename\*?=(?:UTF-8''|")?([^";]+)"?/i);
+      const fallback = `${(testTitle || `test_${testId}`).replace(/[^a-zA-Z0-9]/g, '_')}_results.${format}`;
+      const filename = match ? decodeURIComponent(match[1]) : fallback;
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Export failed. Please try again.');
+    }
   };
-  const handleExportExcel = () => {
-    window.open(`/api/teacher/tests/${testId}/results/export?format=xlsx`, '_blank');
-  };
+
+  const handleExportCSV = () => downloadExport('csv');
+  const handleExportExcel = () => downloadExport('xlsx');
 
   // Debounce search input
   useEffect(() => {
