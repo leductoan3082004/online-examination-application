@@ -89,12 +89,14 @@ const ViewClassResult: React.FC = () => {
   const PAGE_SIZE = 20;
 
   const downloadExport = async (format: 'csv' | 'xlsx') => {
+    console.log('[export] clicked', { format, testId });
     if (!testId) return;
     try {
       const response = await api.get(`/teacher/tests/${testId}/results/export`, {
         params: { format },
         responseType: 'blob',
       });
+      console.log('[export] response', response.status, response.headers['content-type']);
 
       const disposition = response.headers['content-disposition'] as string | undefined;
       const match = disposition?.match(/filename\*?=(?:UTF-8''|")?([^";]+)"?/i);
