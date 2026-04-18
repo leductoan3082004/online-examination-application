@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, Trash2, KeyRound, Clock, ShieldCheck } from 'lucide-react';
+import { Plus, FileText, Trash2, KeyRound, Clock, ShieldCheck, BarChart2 } from 'lucide-react';
 import { TestService, type TestItem } from '../services/teacherTestService';
 
 const TeacherDashboard: React.FC = () => {
@@ -26,19 +26,17 @@ const TeacherDashboard: React.FC = () => {
     fetchTests();
   }, []);
 
-  const handleCreateTest = () => {
-    navigate('/teacher/create-test');
-  };
+  const handleCreateTest = () => navigate('/teacher/create-test');
+  const handleEditTest = (testId: string) => navigate(`/dashboard/tests/${testId}/edit`);
 
-  const handleEditTest = (testId: string) => {
-    navigate(`/dashboard/tests/${testId}/edit`);
+  const handleViewResults = (e: React.MouseEvent, testId: string) => {
+    e.stopPropagation(); // Ngăn click vào card (mở trang edit)
+    navigate(`/dashboard/tests/${testId}/results`);
   };
 
   const handleDeleteTest = async (e: React.MouseEvent, testId: string) => {
     e.stopPropagation();
     const confirmDelete = window.confirm('Are you sure you want to delete this test?');
-
-
     if (confirmDelete) {
       try {
         await TestService.deleteTest(testId);
@@ -52,9 +50,7 @@ const TeacherDashboard: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+      month: 'short', day: 'numeric', year: 'numeric',
     });
   };
 
@@ -136,6 +132,7 @@ const TeacherDashboard: React.FC = () => {
                     </span>
                   </div>
 
+
                   <div className="flex items-center justify-between text-sm text-gray-500">
                     <span className="flex items-center gap-1.5">
                       <FileText size={16} />
@@ -146,6 +143,15 @@ const TeacherDashboard: React.FC = () => {
                       {formatDate(test.createdAt)}
                     </span>
                   </div>
+
+                  {/* View Results button */}
+                  <button
+                    onClick={(e) => handleViewResults(e, test.id)}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-[#0056D2]/20 text-[#0056D2] text-sm font-semibold hover:bg-[#0056D2] hover:text-white hover:border-[#0056D2] transition-all cursor-pointer"
+                  >
+                    <BarChart2 size={15} />
+                    View Results
+                  </button>
                 </div>
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-[#0056D2] transition-colors" />
               </div>
