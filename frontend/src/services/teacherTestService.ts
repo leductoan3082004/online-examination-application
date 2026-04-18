@@ -26,4 +26,41 @@ export const TestService = {
   updateTest: async (testId: string, testData: { title: string; description: string; passcode: string }): Promise<void> => {
     await api.put(`/teacher/tests/${testId}`, testData);
   },
+
+  getTestStatistics: async (testId: string): Promise<TestStatistics> => {
+    const response = await api.get(`/teacher/tests/${testId}/statistics`);
+    return response.data;
+  },
+
+  getQuestionAnalysis: async (testId: string): Promise<QuestionAnalysis[]> => {
+    const response = await api.get(`/teacher/tests/${testId}/question-analysis`);
+    return response.data;
+  },
 };
+
+export interface TestStatistics {
+  averageScore: number;
+  highestScore: number;
+  lowestScore: number;
+  passRate: number;
+  totalStudents: number;
+  scoreDistribution: {
+    bucket: string;
+    count: number;
+  }[];
+}
+
+export interface QuestionAnalysis {
+  questionId: string;
+  questionOrder: number;
+  questionText: string;
+  pointValue: number;
+  correctRate: number;
+  options: {
+    id: string;
+    text: string;
+    isCorrect: boolean;
+    pickCount: number;
+    pickPercentage: number;
+  }[];
+}

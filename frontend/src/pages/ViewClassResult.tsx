@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Search,
   ArrowLeft,
@@ -9,8 +9,12 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  BarChart2,
+  Download,
+  FileSpreadsheet,
 } from 'lucide-react';
 import api from '../services/api';
+import TestStatisticsPanel from '../components/teacher/TestStatisticsPanel';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -83,6 +87,14 @@ const ViewClassResult: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [page, setPage] = useState(0);
   const PAGE_SIZE = 20;
+
+  // Task 15 logic
+  const handleExportCSV = () => {
+    window.open(`/api/teacher/tests/${testId}/results/export?format=csv`, '_blank');
+  };
+  const handleExportExcel = () => {
+    window.open(`/api/teacher/tests/${testId}/results/export?format=xlsx`, '_blank');
+  };
 
   // Debounce search input
   useEffect(() => {
@@ -164,7 +176,7 @@ const ViewClassResult: React.FC = () => {
         </button>
 
         {/* Page header */}
-        <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
               {testTitle || 'Class Results'}
@@ -174,29 +186,55 @@ const ViewClassResult: React.FC = () => {
             </p>
           </div>
 
-          {data && (
-            <div className="flex items-center gap-2 bg-white border border-slate-100 rounded-2xl px-4 py-3 shadow-sm self-start">
-              <Users size={18} className="text-[#0056D2]" />
-              <span className="text-sm text-slate-500">Total submissions</span>
-              <span className="text-lg font-bold text-slate-800 ml-1">{data.totalStudents}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-4 flex-wrap">
+            {data && (
+              <div className="flex items-center gap-2 bg-white border border-slate-100 rounded-xl px-4 py-2.5 shadow-sm">
+                <Users size={18} className="text-[#0056D2]" />
+                <span className="text-sm text-slate-500">Total</span>
+                <span className="text-lg font-bold text-slate-800 ml-1">{data.totalStudents}</span>
+              </div>
+            )}
+            
+            <Link 
+              to={`/dashboard/tests/${testId}/question-analysis`}
+              className="flex items-center gap-2 bg-white border border-gray-200 hover:border-[#0056D2] hover:text-[#0056D2] px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm text-slate-700"
+            >
+              <BarChart2 size={18} />
+              Question Analysis
+            </Link>
+          </div>
         </div>
+        
+        {/* Task 13: Test Statistics Panel */}
+        {testId && <TestStatisticsPanel testId={testId} useMockData={false} />}
 
-        {/* Search bar */}
-        <div className="relative mb-6">
-          <Search
-            size={16}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-          />
-          <input
-            id="search-student"
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by student name…"
-            className="w-full md:w-80 pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#0056D2] transition-all shadow-sm"
-          />
+        {/* Toolbar: Search & Task 15 Export */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 mt-8">
+          <div className="relative w-full md:w-80">
+            <Search
+              size={16}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
+            <input
+              id="search-student"
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by student name…"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#0056D2] transition-all shadow-sm"
+            />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button onClick={handleExportCSV} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-colors text-slate-700 shadow-sm cursor-pointer">
+              <Download size={16} />
+              CSV
+            </button>
+            <button onClick={handleExportExcel} className="flex items-center gap-2 px-4 py-2.5 bg-[#107c41] text-white rounded-xl text-sm font-semibold hover:bg-[#0b5e31] transition-colors shadow-sm cursor-pointer">
+              <FileSpreadsheet size={16} />
+              Excel
+            </button>
+          </div>
         </div>
 
         {/* Content area */}
