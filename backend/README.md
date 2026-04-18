@@ -81,6 +81,34 @@ All settings can be overridden with environment variables:
 | `JWT_SECRET`       | (auto-generated)                           | Base64-encoded key   |
 | `JWT_EXPIRATION_MS`| `86400000` (24h)                           | Token expiry in ms   |
 
+## Demo Data
+
+A sample dataset lives at [`db/seed-demo.sql`](db/seed-demo.sql) — 2 teachers, 8 students, 4 tests with 20 questions, and 8 scored attempts. Use the wrapper script to load it safely:
+
+```bash
+# Inspect current row counts without touching anything
+./scripts/seed-demo.sh --check
+
+# Seed ONLY if the relevant tables are empty. Refuses (exit 2) otherwise.
+./scripts/seed-demo.sh
+
+# Wipe every demo table and reseed from scratch. Destructive.
+./scripts/seed-demo.sh --force
+
+./scripts/seed-demo.sh --help
+```
+
+Prerequisites: the Postgres container must be running (`docker compose up -d`) **and** the Spring app must have booted once so Hibernate creates the schema. The script errors out with a clear message if either is missing.
+
+After seeding:
+
+| Role     | Email                | Password   |
+|----------|----------------------|------------|
+| Teacher  | `alice@example.com`  | `demo1234` |
+| Teacher  | `bob@example.com`    | `demo1234` |
+
+Test passcodes for student access: `MATH101`, `GEO202`, `PY303`, `SCI404`.
+
 ## Running Tests
 
 Tests use an in-memory H2 database, no PostgreSQL needed:
