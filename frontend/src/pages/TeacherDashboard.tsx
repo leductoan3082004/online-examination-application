@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, Trash2, KeyRound, Clock, ShieldCheck, BarChart2 } from 'lucide-react';
+import { Plus, FileText, Trash2, KeyRound, Clock, BarChart2 } from 'lucide-react';
 import { TestService, type TestItem } from '../services/teacherTestService';
 
 const TeacherDashboard: React.FC = () => {

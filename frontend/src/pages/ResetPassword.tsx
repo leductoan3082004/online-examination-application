@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Lock, ArrowLeft, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
 import { resetPassword as resetPasswordApi } from '../services/authService';
 
 const ResetPassword: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({ password: '', confirmPassword: '' });

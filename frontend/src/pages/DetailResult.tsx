@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { StudentService } from '../services/studentService';
-import { CheckCircle, XCircle, Info, ChevronLeft, Loader2, Award, UserCheck, Clock, Hash } from 'lucide-react';
+import { CheckCircle, XCircle, Info, ChevronLeft, Loader2, Award, Clock, Hash } from 'lucide-react';
 
 const DetailResult = () => {
     const { attemptId } = useParams();
