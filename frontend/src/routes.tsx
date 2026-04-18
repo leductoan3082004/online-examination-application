@@ -17,6 +17,7 @@ import ViewClassResult from './pages/ViewClassResult';
 import ChangePassword from './pages/ChangePassword';
 import QuestionAnalysisScreen from './pages/QuestionAnalysisScreen';
 import TeacherLayout from './components/common/TeacherLayout';
+import LandingPage from './pages/LandingPage';
 
 const AppRoutes = () => {
   return (
@@ -49,8 +50,8 @@ const AppRoutes = () => {
         <Route path="/dashboard/tests/:testId/question-analysis" element={<QuestionAnalysisScreen />} />
       </Route>
 
-      {/* Default Redirect */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Default: Landing page (student entry point) */}
+      <Route path="/" element={<LandingPage />} />
 
       {/* 404 Page */}
       <Route path="*" element={
