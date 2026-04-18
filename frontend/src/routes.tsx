@@ -12,6 +12,7 @@ import TeacherDashboard from './pages/TeacherDashboard';
 import Result from './pages/Result';
 import DetailResult from './pages/DetailResult';
 import AccessTest from './pages/AccessTest';
+import ViewClassResult from './pages/ViewClassResult';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -31,6 +32,7 @@ const AppRoutes = () => {
       <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
       <Route path="/teacher/create-test" element={<CreateTest />} />
       <Route path="/dashboard/tests/:testId/edit" element={<EditTest />} />
+      <Route path="/dashboard/tests/:testId/results" element={<ViewClassResult />} />
 
       {/* Default Redirect */}
       <Route path="/" element={<Navigate to="/login" replace />} />

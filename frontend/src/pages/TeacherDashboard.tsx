@@ -117,7 +117,7 @@ export const TeacherDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-auto space-y-4 pt-4 border-t border-slate-50">
+                <div className="mt-auto space-y-3 pt-4 border-t border-slate-50">
                   <div className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-1.5 text-slate-500 font-medium">
                       <KeyRound size={16} className="text-[#0056D2]" /> Passcode:
@@ -135,6 +135,15 @@ export const TeacherDashboard: React.FC = () => {
                       <Clock size={16} className="text-slate-300" /> {formatDate(test.createdAt)}
                     </span>
                   </div>
+
+                  {/* View Results button */}
+                  <button
+                    onClick={(e) => handleViewResults(e, test.id)}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-[#0056D2]/20 text-[#0056D2] text-sm font-semibold hover:bg-[#0056D2] hover:text-white hover:border-[#0056D2] transition-all cursor-pointer"
+                  >
+                    <BarChart2 size={15} />
+                    View Results
+                  </button>
                 </div>
               </div>
             ))}
