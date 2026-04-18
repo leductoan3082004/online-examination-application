@@ -1,45 +1,39 @@
 import api from './api';
+import type { Question, QuestionPayload } from '../types';
 
-export const getQuestions = async (testId: string) => {
-  const response = await api.get(`/teacher/tests/${testId}/questions`);
-  return response.data;
-};
+const API_BASE_URL = '/teacher/tests';
 
-export const addQuestion = async (testId: string, questionData: any) => {
-  const response = await api.post(`/teacher/tests/${testId}/questions`, questionData);
-  return response.data;
-};
+export const testService = {
+  // BE-3.2: Get Questions
+  getQuestions: async (testId: string): Promise<Question[]> => {
+    try {
+      const response = await api.get(`${API_BASE_URL}/${testId}/questions`);
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error("Lỗi lấy danh sách câu hỏi:", error.response?.status);
+      return [];
+    }
+  },
 
-export const updateQuestion = async (testId: string, questionId: string, questionData: any) => {
-  const response = await api.put(`/teacher/tests/${testId}/questions/${questionId}`, questionData);
-  return response.data;
-};
-
-export const deleteQuestion = async (testId: string, questionId: string) => {
-  const response = await api.delete(`/teacher/tests/${testId}/questions/${questionId}`);
-  return response.data;
-};
-
-export const reorderQuestions = async (testId: string, questionIds: string[]) => {
-  const response = await api.put(`/teacher/tests/${testId}/questions/reorder`, { questionIds });
-  return response.data;
-};
-
-export interface TestItem {
-  id: string;
-  title: string;
-  passcode: string;
-  questionCount: number;
-  createdAt: string;
-}
-
-export const TestService = {
-  getTests: async (): Promise<TestItem[]> => {
-    const response = await api.get('/teacher/tests');
+  // BE-3.1: Add Question
+  createQuestion: async (testId: string, payload: QuestionPayload): Promise<Question> => {
+    const response = await api.post(`${API_BASE_URL}/${testId}/questions`, payload);
     return response.data;
   },
 
-  deleteTest: async (testId: string): Promise<void> => {
-    await api.delete(`/teacher/tests/${testId}`);
+  // BE-3.3: Update Question
+  updateQuestion: async (testId: string, questionId: string | number, payload: QuestionPayload): Promise<Question> => {
+    const response = await api.put(`${API_BASE_URL}/${testId}/questions/${questionId}`, payload);
+    return response.data;
   },
+
+  // BE-3.4: Delete Question
+  deleteQuestion: async (testId: string, questionId: string | number): Promise<void> => {
+    await api.delete(`${API_BASE_URL}/${testId}/questions/${questionId}`);
+  },
+
+  // BE-3.5: Reorder Questions
+  reorderQuestions: async (testId: string, questionIds: (string | number)[]): Promise<void> => {
+    await api.put(`${API_BASE_URL}/${testId}/questions/reorder`, { questionIds });
+  }
 };

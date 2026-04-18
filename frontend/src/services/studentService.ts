@@ -13,8 +13,8 @@ export interface Question {
             id: number;
             optionText: string;
             displayOrder: number;
-        } [];
-    } [];
+        }[];
+    }[];
 }
 
 export const StudentService = {
@@ -33,7 +33,7 @@ export const StudentService = {
         return response.data;
     },
 
-    submitTestAnswer: async (attemptId: number, answers: {questionId: number, optionId: number}[]) => {
+    submitTestAnswer: async (attemptId: number, answers: { questionId: number, optionId: number }[]) => {
         const response = await api.post(`/student/attempts/${attemptId}/submit`, answers);
         return response.data;
     },
