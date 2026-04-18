@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { User, ClipboardList, ArrowRight, AlertCircle, Clock, BookOpen, CheckCircle2, Circle } from 'lucide-react';
 import { StudentService, type Question } from '../services/studentService';
 
 const TakeTest: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // attemptId is persisted in localStorage (set by AccessTest)
+  // Not needed for submit - we use testId from URL
   
   const [step, setStep] = useState<'welcome' | 'exam'>('welcome');
   const [studentInfo, setStudentInfo] = useState({ name: '', studentId: '' });
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-fill student name if passed from LandingPage
+  useEffect(() => {
+    if (location.state?.studentName) {
+      setStudentInfo(prev => ({ ...prev, name: location.state.studentName }));
+    }
+  }, [location.state]);
   
   const [isLoading, setIsLoading] = useState(true);
   const [testData, setTestData] = useState<Question | null>(null);
@@ -59,17 +70,22 @@ const TakeTest: React.FC = () => {
 
     const answersArray = Object.entries(answers).map(([qId, oId]) => ({
       questionId: Number(qId),
-      optionId: oId
+      selectedOptionId: oId   // BE-9.1 expects selectedOptionId
     }));
 
     try {
       setIsLoading(true);
-      await StudentService.submitTestAnswer(Number(id), answersArray);
-      alert("Test submitted successfully!");
-      navigate('/student/dashboard');
-    } catch (err) {
+      // BE-9.1: POST /student/tests/{testId}/submit
+      const result = await StudentService.submitTestAnswer(Number(id), answersArray);
+      // Navigate to result page with the attemptId returned by backend
+      navigate(`/results/${result.attemptId}`);
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to submit the test. Please try again.");
+      if (err.response?.status === 409) {
+        alert("You have already submitted this test.");
+      } else {
+        alert("Failed to submit the test. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -130,6 +146,7 @@ const TakeTest: React.FC = () => {
               )}
 
               <form onSubmit={handleStartExam} className="space-y-4">
+                {/* Only show name input if not already provided, or show as read-only/pre-filled */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700 ml-1">Full Name</label>
                   <div className="relative">

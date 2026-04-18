@@ -39,28 +39,31 @@ export const TestService = {
 };
 
 export interface TestStatistics {
+  totalAttempts: number;
   averageScore: number;
   highestScore: number;
   lowestScore: number;
+  averagePercentage: number;
   passRate: number;
-  totalStudents: number;
-  scoreDistribution: {
-    bucket: string;
+  passThreshold: number;
+  distribution: {
+    range: string;    // BE-13.1 uses "range", not "bucket"
     count: number;
   }[];
 }
 
 export interface QuestionAnalysis {
-  questionId: string;
-  questionOrder: number;
+  questionId: number;
+  questionOrder?: number;
   questionText: string;
-  pointValue: number;
+  points: number;           // BE-14.1 says "points"
   correctRate: number;
-  options: {
-    id: string;
-    text: string;
+  totalAnswers: number;
+  optionDistribution: {    // BE-14.1 says "optionDistribution"
+    optionId: number;
+    optionText: string;
     isCorrect: boolean;
-    pickCount: number;
-    pickPercentage: number;
+    count: number;
+    percentage: number;
   }[];
 }

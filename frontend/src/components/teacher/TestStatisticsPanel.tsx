@@ -29,22 +29,24 @@ const TestStatisticsPanel: React.FC<TestStatisticsPanelProps> = ({ testId, useMo
       if (useMockData) {
         setTimeout(() => {
           setStats({
+            totalAttempts: 124,
             averageScore: 78.5,
             highestScore: 100,
             lowestScore: 35,
+            averagePercentage: 78.5,
             passRate: 85,
-            totalStudents: 124,
-            scoreDistribution: [
-              { bucket: "0-10", count: 2 },
-              { bucket: "11-20", count: 1 },
-              { bucket: "21-30", count: 3 },
-              { bucket: "31-40", count: 5 },
-              { bucket: "41-50", count: 8 },
-              { bucket: "51-60", count: 15 },
-              { bucket: "61-70", count: 25 },
-              { bucket: "71-80", count: 35 },
-              { bucket: "81-90", count: 20 },
-              { bucket: "91-100", count: 10 }
+            passThreshold: 50,
+            distribution: [
+              { range: "0-10%", count: 2 },
+              { range: "10-20%", count: 1 },
+              { range: "20-30%", count: 3 },
+              { range: "30-40%", count: 5 },
+              { range: "40-50%", count: 8 },
+              { range: "50-60%", count: 15 },
+              { range: "60-70%", count: 25 },
+              { range: "70-80%", count: 35 },
+              { range: "80-90%", count: 20 },
+              { range: "90-100%", count: 10 }
             ]
           });
           setIsLoading(false);
@@ -158,7 +160,7 @@ const TestStatisticsPanel: React.FC<TestStatisticsPanelProps> = ({ testId, useMo
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Students</span>
           </div>
           <div>
-            <span className="text-2xl font-extrabold text-slate-900">{stats.totalStudents}</span>
+            <span className="text-2xl font-extrabold text-slate-900">{stats.totalAttempts}</span>
           </div>
         </div>
       </div>
@@ -171,13 +173,13 @@ const TestStatisticsPanel: React.FC<TestStatisticsPanelProps> = ({ testId, useMo
         </div>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={stats.scoreDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <BarChart data={stats.distribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis 
-                dataKey="bucket" 
+                dataKey="range"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 12 }}
+                tick={{ fill: '#64748b', fontSize: 11 }}
                 dy={10}
               />
               <YAxis 

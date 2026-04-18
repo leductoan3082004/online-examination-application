@@ -80,6 +80,7 @@ const ViewClassResult: React.FC = () => {
   const [testTitle, setTestTitle] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -88,12 +89,45 @@ const ViewClassResult: React.FC = () => {
   const [page, setPage] = useState(0);
   const PAGE_SIZE = 20;
 
-  // Task 15 logic
-  const handleExportCSV = () => {
-    window.open(`/api/teacher/tests/${testId}/results/export?format=csv`, '_blank');
-  };
-  const handleExportExcel = () => {
-    window.open(`/api/teacher/tests/${testId}/results/export?format=xlsx`, '_blank');
+  // Task 15 logic - Robust Export Method using Axios API instance (supports Bearer Token)
+  const handleExport = async (format: 'csv' | 'xlsx') => {
+    if (!testId || isExporting) return;
+    setIsExporting(true);
+
+    try {
+      const response = await api.get(`/teacher/tests/${testId}/results/export`, {
+        params: { format },
+        responseType: 'blob', // Quan trọng: Yêu cầu Axios trả về dữ liệu dạng nhị phân (blob)
+      });
+
+      // Lấy tên file từ header (nếu server có trả về)
+      const disposition = response.headers['content-disposition'];
+      let filename = `Results_Test_${testId}.${format}`;
+      if (disposition && disposition.indexOf('attachment') !== -1) {
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(disposition);
+        if (matches != null && matches[1]) {
+          filename = matches[1].replace(/['"]/g, '');
+        }
+      }
+
+      // Tạo url giả và thẻ <a> để tự động tải xuống
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+
+      // Dọn dẹp DOM
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error(`Export error (${format}):`, err);
+      alert(`Failed to download ${format.toUpperCase()}. Please try again.`);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   // Debounce search input
@@ -194,8 +228,8 @@ const ViewClassResult: React.FC = () => {
                 <span className="text-lg font-bold text-slate-800 ml-1">{data.totalStudents}</span>
               </div>
             )}
-            
-            <Link 
+
+            <Link
               to={`/dashboard/tests/${testId}/question-analysis`}
               className="flex items-center gap-2 bg-white border border-gray-200 hover:border-[#0056D2] hover:text-[#0056D2] px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm text-slate-700"
             >
@@ -204,7 +238,7 @@ const ViewClassResult: React.FC = () => {
             </Link>
           </div>
         </div>
-        
+
         {/* Task 13: Test Statistics Panel */}
         {testId && <TestStatisticsPanel testId={testId} useMockData={false} />}
 
@@ -225,14 +259,22 @@ const ViewClassResult: React.FC = () => {
             />
           </div>
 
-          <div className="flex items-center gap-3">
-            <button onClick={handleExportCSV} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-colors text-slate-700 shadow-sm cursor-pointer">
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <button
+              onClick={() => handleExport('csv')}
+              disabled={isExporting}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-colors text-slate-700 shadow-sm cursor-pointer disabled:opacity-50 w-full md:w-auto"
+            >
               <Download size={16} />
-              CSV
+              Download CSV
             </button>
-            <button onClick={handleExportExcel} className="flex items-center gap-2 px-4 py-2.5 bg-[#107c41] text-white rounded-xl text-sm font-semibold hover:bg-[#0b5e31] transition-colors shadow-sm cursor-pointer">
+            <button
+              onClick={() => handleExport('xlsx')}
+              disabled={isExporting}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#107c41] text-white rounded-xl text-sm font-semibold hover:bg-[#0b5e31] transition-colors shadow-sm cursor-pointer disabled:opacity-50 w-full md:w-auto"
+            >
               <FileSpreadsheet size={16} />
-              Excel
+              Download Excel
             </button>
           </div>
         </div>
@@ -297,9 +339,8 @@ const ViewClassResult: React.FC = () => {
                     {data!.results.map((student, idx) => (
                       <tr
                         key={student.attemptId}
-                        className={`border-b border-slate-50 hover:bg-blue-50/40 transition-colors ${
-                          idx % 2 === 0 ? '' : 'bg-slate-50/30'
-                        }`}
+                        className={`border-b border-slate-50 hover:bg-blue-50/40 transition-colors ${idx % 2 === 0 ? '' : 'bg-slate-50/30'
+                          }`}
                       >
                         {/* Student name */}
                         <td className="px-6 py-4">
@@ -368,20 +409,19 @@ const ViewClassResult: React.FC = () => {
                       totalPages <= 5
                         ? i
                         : page <= 2
-                        ? i
-                        : page >= totalPages - 3
-                        ? totalPages - 5 + i
-                        : page - 2 + i;
+                          ? i
+                          : page >= totalPages - 3
+                            ? totalPages - 5 + i
+                            : page - 2 + i;
                     return (
                       <button
                         key={pageNum}
                         id={`btn-page-${pageNum + 1}`}
                         onClick={() => setPage(pageNum)}
-                        className={`w-9 h-9 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
-                          pageNum === page
+                        className={`w-9 h-9 rounded-xl text-sm font-semibold transition-all cursor-pointer ${pageNum === page
                             ? 'bg-[#0056D2] text-white shadow-sm'
                             : 'bg-white border border-slate-200 text-slate-600 hover:border-[#0056D2]/40 hover:text-[#0056D2]'
-                        }`}
+                          }`}
                       >
                         {pageNum + 1}
                       </button>

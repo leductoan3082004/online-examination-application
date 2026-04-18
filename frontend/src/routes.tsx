@@ -1,6 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AuthLayout from './components/common/AuthLayout';
-import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -17,6 +16,7 @@ import ViewClassResult from './pages/ViewClassResult';
 import ChangePassword from './pages/ChangePassword';
 import QuestionAnalysisScreen from './pages/QuestionAnalysisScreen';
 import TeacherLayout from './components/common/TeacherLayout';
+import LandingPage from './pages/LandingPage';
 
 const AppRoutes = () => {
   return (
@@ -49,8 +49,8 @@ const AppRoutes = () => {
         <Route path="/dashboard/tests/:testId/question-analysis" element={<QuestionAnalysisScreen />} />
       </Route>
 
-      {/* Default Redirect */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Default: Landing page (student entry point) */}
+      <Route path="/" element={<LandingPage />} />
 
       {/* 404 Page */}
       <Route path="*" element={
