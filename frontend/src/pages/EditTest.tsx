@@ -149,7 +149,8 @@ export default function EditTest() {
             <div className="flex gap-3">
               <button
                 onClick={() => navigate('/teacher/dashboard')}
-                className="text-[#636363] hover:text-[#1F1F1F] font-bold text-sm px-4 py-2"
+                className="text-[#636363] hover:text-[#1F1F1F] 
+                font-bold text-sm px-4 py-2 cursor-pointer"
               >
                 Cancel
               </button>
