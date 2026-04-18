@@ -15,14 +15,15 @@ WORKDIR /app/backend
 # Copy pom.xml for dependency caching
 COPY backend/pom.xml ./
 RUN mvn dependency:go-offline
-# Copy backend source
+# Copy backend source and configuration
 COPY backend/src ./src
 COPY backend/checkstyle.xml ./
-# Create static directory if it doesn't exist and copy frontend build
-RUN mkdir -p src/main/resources/static
-COPY --from=frontend-build /app/frontend/dist/ src/main/resources/static/
-# Build the JAR
-RUN mvn clean package -DskipTests
+
+# Copy frontend build into backend static resources
+COPY --from=frontend-build /app/frontend/dist/ ./src/main/resources/static/
+
+# Build the JAR (no clean needed, fresh container)
+RUN mvn package -DskipTests
 
 # Stage 3: Runtime
 FROM eclipse-temurin:21-jre-jammy
